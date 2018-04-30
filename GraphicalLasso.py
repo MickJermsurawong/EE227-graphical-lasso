@@ -37,7 +37,12 @@ class GraphicalLasso(object):
         X[:j, j] = x[:j]
         X[j + 1:, j] = x[j:]
 
+    @staticmethod
+    def _is_psd(W):
+        return np.all(np.linalg.eigvals(W) > 0)
+
     def fit(self, S, l1_lambda=0.01, verbose=False):
+
         assert np.array_equal(S, S.T), "Initial empirical covariance should be symmetric"
         feature_dim = S.shape[0]
         W = np.copy(S)
@@ -58,15 +63,18 @@ class GraphicalLasso(object):
             W_11, _, _ = GraphicalLasso._partition_blockwise(W, j)
             s_12 = s_12_all[j]
 
-            l1_solver.fit(W_11, s_12)
+            assert GraphicalLasso._is_psd(W_11), f"Each submatrix should be psd.., but given {W}"
+
+            l1_solver.fit_gram_scikit(W_11, s_12)
             beta = l1_solver.coef_
+
             w_12_estimated = np.matmul(W_11, beta)
 
             return beta, w_12_estimated
 
         # Check convergence
-        all_betas = [np.ones(feature_dim -1) for j in range(feature_dim)]
-        all_w_12s = [np.ones(feature_dim -1) for j in range(feature_dim)]
+        all_betas = [np.ones(feature_dim -1) for _ in range(feature_dim)]
+        all_w_12s = [np.ones(feature_dim -1) for _ in range(feature_dim)]
 
         count_converge = 0
         iter_num = 0
@@ -105,3 +113,4 @@ class GraphicalLasso(object):
             Theta[j][j] = theta_22
 
         return Theta
+

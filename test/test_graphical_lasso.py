@@ -1,9 +1,9 @@
 from unittest import TestCase
 
-from sklearn import linear_model
+import numpy as np
 
 from GraphicalLasso import GraphicalLasso as GL
-import numpy as np
+from LassoSolver import LassoSolver
 
 
 class TestGraphicalLasso(TestCase):
@@ -54,21 +54,18 @@ class TestGraphicalLasso(TestCase):
         assert np.array_equal(Theta_true.T, Theta_true), "True precision should be symmetric"
 
         cov = np.linalg.inv(Theta_true)
-        data_set = np.random.multivariate_normal(np.zeros(feature_dim), cov, (20000))
+        data_set = np.random.multivariate_normal(np.zeros(feature_dim), cov, (20))
         S = np.cov(data_set.T)
         S_inv = np.linalg.inv(S)
 
-        gl = GL(l1_solver_f=linear_model.Lasso)
+        gl = GL(l1_solver_f=LassoSolver)
 
         theta_estimated = gl.fit(S, l1_lambda=0.0001)
 
         self.assertEqual(theta_estimated.shape[0], feature_dim)
 
-        print("Estimated: ")
-        print(np.round(theta_estimated, decimals=2))
-
-        print("S-inverse: ")
-        print(np.round(S_inv, decimals=2))
+        print(f"Estimated: \n{np.round(theta_estimated, decimals=2)}")
+        print(f"S-inverse: \n{np.round(S_inv, decimals=2)}")
 
         for i in range(feature_dim):
             for j in range(feature_dim):
