@@ -3,7 +3,7 @@ from unittest import TestCase
 import numpy as np
 from sklearn import linear_model
 
-from LassoSolver import LassoSolver
+from GramLassoSolver import GramLassoSolver
 
 
 class TestLasso(TestCase):
@@ -25,7 +25,7 @@ class TestLasso(TestCase):
         XTX = np.matmul(X.T, X)
         XTy = np.matmul(X.T, y)
 
-        gram_lasso = LassoSolver(alpha=0.1)
+        gram_lasso = GramLassoSolver(alpha=0.1)
 
         gram_lasso.fit_gram_scikit(XTX, XTy)
         g_lasso_w_scikit = gram_lasso.coef_

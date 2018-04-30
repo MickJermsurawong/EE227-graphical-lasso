@@ -2,7 +2,7 @@ import numpy as np
 from sklearn.linear_model import coordinate_descent
 
 
-class LassoSolver(object):
+class GramLassoSolver(object):
 
     def __init__(self, alpha):
 

@@ -3,7 +3,7 @@ from unittest import TestCase
 import numpy as np
 
 from GraphicalLasso import GraphicalLasso as GL
-from LassoSolver import LassoSolver
+from GramLassoSolver import GramLassoSolver
 
 
 class TestGraphicalLasso(TestCase):
@@ -58,7 +58,7 @@ class TestGraphicalLasso(TestCase):
         S = np.cov(data_set.T)
         S_inv = np.linalg.inv(S)
 
-        gl = GL(l1_solver_f=LassoSolver)
+        gl = GL(l1_solver_f=GramLassoSolver)
 
         theta_estimated = gl.fit(S, l1_lambda=0.0001)
 
