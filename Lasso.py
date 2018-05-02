@@ -1,61 +1,65 @@
 import numpy as np
 from numpy import linalg as LA 
 
-class Lasso(object):
+class Lasso2(object):
     
-    def __init__(self, alpha):
-        self.alpha = alpha
-        self.coef_ = None
-        self.n_iter = None
-        
-    def soft_tresh(self,x):
-        return np.sign(x)*(np.maximum(0,np.abs(x)- self.alpha))
-
+    def __init__(self, alpha, max_iter = 1000, fit_intercept = True):
+        self.alpha = alpha 
+        self.n_iter_ = None 
+        self.coef_ = None 
+        self.fit_intercept = fit_intercept 
+        self.intercept_ = None
+        self.max_iter_ = max_iter
+    
+    def soft_tresh(self, x, alpha):
+        if x < -alpha:
+            return x + alpha 
+        elif x > alpha: 
+            return x - alpha 
+        else:
+            return 0
+    
+    def get_objective(self, X, y, beta):
+        n = X.shape[0]
+        obj = (1/2*n)*(LA.norm(y-np.dot(X,beta)))**2 + self.alpha*LA.norm(beta, ord=1)
+        return obj
+    
     def fit(self, X, y):
         p = X.shape[1]
         n = X.shape[0]
-        assert n == y.shape[0]
-        convergence= False
-        beta = np.ones(p)
-        iteration = 0
         
+        if self.fit_intercept: 
+            X = np.column_stack((np.ones(n), X))
+            p = X.shape[1]
+
+        convergence = False
+        beta = np.zeros(p)
         
-            
-        while not convergence:
-            j = iteration % p
-                
-            #store prev beta
-            beta_prev = np.copy(beta)
+        if self.fit_intercept: 
+            beta[0] = np.sum(y - np.dot(X[:, 1:], beta[1:]))/n
 
-            #calulating residual vector
-            res = np.ones(n)
-            X_bar = np.delete(X, j, 1)
-            beta_bar = np.delete(beta, j)
-            assert X_bar.shape[1] == beta_bar.shape[0]
+        for i in range (self.max_iter_):
+            if self.fit_intercept: 
+                index = 1
+            else:
+                index = 0
             
-            res = y -  np.dot(X_bar, beta_bar)
-
-            #updating current beta
-            update = (1/n) * np.dot(X[:,j], res)
-            norm_xj = (1/n)*np.square(LA.norm(X[:,j]))
-            beta[j] = self.soft_tresh(update)/norm_xj
-
-            #checking for convergence
-            
-            obj = (1/(2*n)) * np.square(LA.norm(y-np.dot(X,beta))) + self.alpha*LA.norm(beta, 1)
-            obj_prev = (1/(2*n)) * np.square(LA.norm(y-np.dot(X,beta_prev))) + self.alpha*LA.norm(beta_prev, 1)
-            
-            iteration += 1
-            if np.isclose(obj, obj_prev, rtol = 0.00001):
-                convergence = True  
-                self.n_iter = iteration
-            
-            def intercept(X,y,beta):
-                beta_0 = np.mean(y)
-                for j in range(0,p):
-                    beta_0 -= np.mean(X[:,j]*beta[j])
-                return beta_0
-                    
-                    
-            
-        self.coef_ = beta 
+            for j in range(index, p):
+                beta_prev = np.copy(beta)
+                beta_bar = np.copy(beta)
+                beta_bar[j] = 0
+                r_j = y - np.dot(X, beta_bar)
+                x_j = X[:,j]
+                beta[j] = (1/LA.norm(x_j))**2 * self.soft_tresh(np.dot(r_j, x_j), n*self.alpha)
+                if self.fit_intercept: 
+                    beta[0] = np.sum(y - np.dot(X[:, 1:], beta[1:]))/n
+           
+            #if np.allclose(beta, beta_prev, rtol = 1e-10) and np.isclose(self.get_objective(X,y,beta), self.get_objective(X,y,beta_prev), rtol=1e-10):
+                #break
+         
+        self.n_iter_ = i
+        if self.fit_intercept:
+            self.intercept_ = beta[0]
+            self.coef_ = beta[1:]
+        else:
+            self.coef_ = beta    
