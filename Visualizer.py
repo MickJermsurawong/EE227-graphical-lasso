@@ -3,6 +3,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 plt.rcParams["figure.figsize"] = (10,10)
 
+from nltk import tokenize
+
+
+tokenize.WhitespaceTokenizer().tokenize(text="Cnn.com")
 def plot_network(adj_mat, labels):
     G = nx.Graph()
 
