@@ -24,7 +24,6 @@ class NGraphSelection(object):
             l1_solver.fit(X_rest, X_s)
 
             beta_s = l1_solver.coef_
-            print(beta_s)
 
             for i in range(p - 1):
                 t = i + 1 if i >= s else i

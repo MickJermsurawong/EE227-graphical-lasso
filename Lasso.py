@@ -1,15 +1,17 @@
 import numpy as np
-from numpy import linalg as LA 
+from numpy import linalg as LA
+import copy
 
 class Lasso2(object):
     
-    def __init__(self, alpha, max_iter = 1000, fit_intercept = True):
+    def __init__(self, alpha, max_iter = 1000, fit_intercept = True, tol = 1e-8):
         self.alpha = alpha 
         self.n_iter_ = None 
         self.coef_ = None 
         self.fit_intercept = fit_intercept 
         self.intercept_ = None
         self.max_iter_ = max_iter
+        self.tol = tol
     
     def soft_tresh(self, x, alpha):
         if x < -alpha:
@@ -55,7 +57,8 @@ class Lasso2(object):
                     beta[0] = np.sum(y - np.dot(X[:, 1:], beta[1:]))/n
            
             #if np.allclose(beta, beta_prev, rtol = 1e-10) and np.isclose(self.get_objective(X,y,beta), self.get_objective(X,y,beta_prev), rtol=1e-10):
-                #break
+            #if ((abs(beta_prev - beta)<=self.tol).all ()):
+            #    break
          
         self.n_iter_ = i
         if self.fit_intercept:
