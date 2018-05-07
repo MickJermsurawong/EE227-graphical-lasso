@@ -1,13 +1,14 @@
+import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
-import matplotlib.pyplot as plt
+from collections import Counter
+
 plt.rcParams["figure.figsize"] = (10,10)
 
 from nltk import tokenize
 
 
-tokenize.WhitespaceTokenizer().tokenize(text="Cnn.com")
-def plot_network(adj_mat, labels):
+def plot_network(adj_mat, labels, save_file_name=None):
     G = nx.Graph()
 
     edges = []
@@ -37,4 +38,43 @@ def plot_network(adj_mat, labels):
     nx.draw_networkx_labels(G, pos, font_size=12, font_family='sans-serif')
 
     plt.axis('off')
+
+
+    if save_file_name:
+        plt.savefig(save_file_name)
+
     plt.show()
+
+def sentiments_by_sources(total_introductions, key='sentiment'):
+    before_size = plt.rcParams["figure.figsize"]
+
+    source_ent_sent = {}
+
+    for intro in total_introductions:
+        p = intro['person']
+        s = intro['source']
+        source_ent_sent.setdefault(s, {})
+        source_ent_sent[s].setdefault(p, [])
+        source_ent_sent[s][p].append(intro[key])
+
+    plt.rcParams["figure.figsize"] = (20, 20)
+
+    f, axes = plt.subplots(5, 5, sharex=True, sharey=True)
+
+    source_list = list(source_ent_sent.keys())
+    source_ent_sent_list = [np.hstack(list(source_ent_sent[source].values())) for source in source_list]
+    for i in range(5):
+        for j in range(5):
+
+            idx = (i * 5) + j
+            if idx >= len(source_ent_sent):
+                break
+
+            axes[i][j].hist(source_ent_sent_list[idx])
+            axes[i][j].set_title(source_list[idx])
+
+    plt.suptitle("Introduction Sentiments across Sources")
+
+    plt.show()
+
+    plt.rcParams["figure.figsize"] = before_size

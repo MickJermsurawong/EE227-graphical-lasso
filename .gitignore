@@ -3,3 +3,6 @@
 *.pyc
 *.pdf
 *.pickle
+data/
+results/
+
