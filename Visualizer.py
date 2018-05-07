@@ -8,7 +8,7 @@ plt.rcParams["figure.figsize"] = (10,10)
 from nltk import tokenize
 
 
-def plot_network(adj_mat, labels, save_file_name=None):
+def plot_network(adj_mat, labels, title=None, save_file_name=None):
     G = nx.Graph()
 
     edges = []
@@ -39,6 +39,8 @@ def plot_network(adj_mat, labels, save_file_name=None):
 
     plt.axis('off')
 
+    if title:
+        plt.title(title)
 
     if save_file_name:
         plt.savefig(save_file_name)
