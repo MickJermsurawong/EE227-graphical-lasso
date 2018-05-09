@@ -1,6 +1,6 @@
 Students: 
 
-Mari Hovem Leonhardse, SID: 3033483726
+Mari Hovem Leonhardsen, SID: 3033483726
 Mick Jermsurawong, SID: 
 Yannik Pitcan, SID: 
 
